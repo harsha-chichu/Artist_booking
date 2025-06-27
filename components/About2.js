@@ -22,10 +22,11 @@ const About = () => {
               Meet the Artist
             </h2>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Hi, I'm Aria! I'm a professional live event painter who specializes in capturing the magic and emotion of your special moments through art. With over 5 years of experience, I've had the privilege of painting at weddings, corporate events, and private celebrations across the country.
+              lorum ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+              Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
             </p>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              My passion lies in creating beautiful, one-of-a-kind paintings that serve as lasting memories of your most important occasions. Each piece is painted live during your event, allowing your guests to witness the artistic process and take home a unique keepsake.
+              lorum ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
             </p>
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center p-4 bg-purple-50 rounded-lg">
@@ -38,12 +39,21 @@ const About = () => {
                     direction="up"
                     duration={1}
                     className="count-up-text"
-                  />
+                  />{'+'}
                 </div>
                 <div className="text-gray-600">Events Painted</div>
               </div>
               <div className="text-center p-4 bg-pink-50 rounded-lg">
-                <div className="text-2xl font-bold text-pink-600 mb-2">5+</div>
+                <div className="text-2xl font-bold text-pink-600 mb-2">
+                  <CountUp
+                    from={0}
+                    to={5}
+                    separator=","
+                    direction="up"
+                    duration={1}
+                    className="count-up-text"
+                  />{'+'}
+                </div>
                 <div className="text-gray-600">Years Experience</div>
               </div>
             </div>

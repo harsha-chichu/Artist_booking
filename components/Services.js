@@ -8,7 +8,7 @@ export default function Services({ services }) {
       <div className="max-w-7xl mx-auto text-center mb-12">
         <h2 className="text-3xl font-bold mb-4">Services</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Discover the art services we offer, tailored to capture your special moments.
+          Discover the art services i offer, tailored to capture your special moments.
         </p>
       </div>
 

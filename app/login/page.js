@@ -1,44 +1,68 @@
 "use client";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session?.user) {
+        router.push("/admin/dashboard");
+      }
+    };
+    checkSession();
+  }, [router]);
 
-    // Replace with your actual credentials (or env vars in production)
-    if (email === "admin@example.com" && password === "admin1234") {
-      localStorage.setItem("auth", "true");
-      router.push("/admin/dashboard");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      alert("❌ Login failed: " + error.message);
     } else {
-      alert("Invalid credentials");
+      router.push("/admin/dashboard");
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form onSubmit={handleLogin} className="bg-white p-6 shadow rounded">
-        <h1 className="text-2xl mb-4">Admin Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white p-8 rounded shadow-md w-full max-w-sm"
+      >
+        <h1 className="text-2xl font-bold mb-6 text-center">Admin Login</h1>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="w-full border px-3 py-2 rounded mb-4"
+          required
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border p-2 w-full mb-4"
+          className="w-full border px-3 py-2 rounded mb-6"
+          required
         />
-        <button type="submit" className="bg-black text-white px-4 py-2 rounded">
-          Login
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>

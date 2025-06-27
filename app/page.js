@@ -4,7 +4,6 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import { initialServices } from '@/services/data';
 import Services from '@/components/Services';
-import About from '@/components/About';
 import About2 from '@/components/About2';
 import Footer from '@/components/Footer';
 import Testimonials from '@/components/Testimonials';

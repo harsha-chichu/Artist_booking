@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,28 @@ const BookingForm = () => {
     location: "",
     message: ""
   });
+
+  const [bookedDates, setBookedDates] = useState([]);
+
+  useEffect(() => {
+    const fetchBookedDates = async () => {
+      console.log("Fetching booked dates from Supabase...");
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("date")
+        .eq("is_booked", true);
+
+      if (error) {
+        console.error("Error fetching booked dates:", error);
+      } else {
+        const booked = data.map((d) => d.date);
+        setBookedDates(booked);
+        console.log("Fetched booked dates:", booked);
+      }
+    };
+
+    fetchBookedDates();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,23 +50,33 @@ const BookingForm = () => {
       return;
     }
 
+    if (bookedDates.includes(formData.eventDate)) {
+      alert("❌ That date is already booked. Please choose another.");
+      return;
+    }
+
     try {
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      console.log("Submitting form with data:", formData);
+      const { data, error } = await supabase
+        .from("bookings")
+        .insert([{
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
           location: formData.location,
-          service: formData.eventType,  // Map eventType to service
-          date: formData.eventDate,     // Map eventDate to date
+          service: formData.eventType,
+          date: formData.eventDate,
           message: formData.message,
-        }),
-      });
+          is_read: false,
+          is_booked: false
+        }]);
 
-      if (res.ok) {
+      if (error) {
+        console.error("Supabase insert error:", error);
+        alert("Something went wrong. Please try again.");
+      } else {
         alert("✅ Inquiry sent! I'll get back to you within 24 hours.");
+        console.log("Booking saved successfully:", data);
         setFormData({
           name: "",
           email: "",
@@ -53,8 +86,6 @@ const BookingForm = () => {
           location: "",
           message: ""
         });
-      } else {
-        alert("Something went wrong. Please try again.");
       }
     } catch (err) {
       console.error("Submit error:", err);
@@ -71,15 +102,15 @@ const BookingForm = () => {
         <p className="text-center text-gray-600 mb-10">
           Fill out the form below and let's bring your vision to life!
         </p>
+
         <form
           onSubmit={handleSubmit}
           className="space-y-6 bg-gray-50 p-8 rounded-xl shadow-lg"
         >
+          {/* Name & Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
               <input
                 type="text"
                 name="name"
@@ -90,9 +121,7 @@ const BookingForm = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
               <input
                 type="email"
                 name="email"
@@ -104,11 +133,10 @@ const BookingForm = () => {
             </div>
           </div>
 
+          {/* Phone & Event Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
               <input
                 type="tel"
                 name="phone"
@@ -120,9 +148,7 @@ const BookingForm = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Event Date *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Event Date *</label>
               <input
                 type="date"
                 name="eventDate"
@@ -130,16 +156,24 @@ const BookingForm = () => {
                 onChange={handleChange}
                 required
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className={`w-full border ${
+                  bookedDates.includes(formData.eventDate)
+                    ? "border-red-500"
+                    : "border-gray-300"
+                } rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500`}
               />
+              {bookedDates.includes(formData.eventDate) && (
+                <p className="text-red-600 text-sm mt-1">
+                  This date is already booked.
+                </p>
+              )}
             </div>
           </div>
 
+          {/* Event Type & Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Event Type
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Event Type</label>
               <select
                 name="eventType"
                 value={formData.eventType}
@@ -154,9 +188,7 @@ const BookingForm = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Event Location
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Event Location</label>
               <input
                 type="text"
                 name="location"
@@ -168,6 +200,7 @@ const BookingForm = () => {
             </div>
           </div>
 
+          {/* Message */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Tell me about your vision
@@ -182,6 +215,7 @@ const BookingForm = () => {
             ></textarea>
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-xl transition duration-300"
