@@ -1,6 +1,37 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import toast from "react-hot-toast";
+import emailjs from "@emailjs/browser";
+
+// ✅ Send Email using EmailJS
+const sendBookingEmail = (bookingData) => {
+  const templateParams = {
+    from_name: bookingData.name,
+    from_email: bookingData.email,
+    phone: bookingData.phone,
+    event_date: bookingData.eventDate,
+    event_type: bookingData.eventType,
+    event_location: bookingData.location,
+    message: bookingData.message || "No additional message",
+  };
+
+  emailjs
+    .send(
+      "service_o5647rn",         // Your EmailJS Service ID
+      "template_kb0laxd",        // Your EmailJS Template ID
+      templateParams,
+      "HWkodYIPJO4oxIP4U"        // Your EmailJS Public Key
+    )
+    .then(
+      (response) => {
+        console.log("✅ Email sent!", response.status, response.text);
+      },
+      (err) => {
+        console.error("❌ Email sending failed:", err);
+      }
+    );
+};
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
@@ -46,12 +77,12 @@ const BookingForm = () => {
     e.preventDefault();
 
     if (!formData.name || !formData.email || !formData.phone || !formData.eventDate) {
-      alert("Please fill in all required fields.");
+      toast.error("Please fill in all required fields.");
       return;
     }
 
     if (bookedDates.includes(formData.eventDate)) {
-      alert("❌ That date is already booked. Please choose another.");
+      toast.error("That date is already booked. Please choose another.");
       return;
     }
 
@@ -73,10 +104,22 @@ const BookingForm = () => {
 
       if (error) {
         console.error("Supabase insert error:", error);
-        alert("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       } else {
-        alert("✅ Inquiry sent! I'll get back to you within 24 hours.");
+        toast.success("Inquiry sent! I'll get back to you within 24 hours.");
         console.log("Booking saved successfully:", data);
+
+        // Send Email
+        sendBookingEmail({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          eventDate: formData.eventDate,
+          eventType: formData.eventType,
+          location: formData.location,
+          message: formData.message
+        });
+
         setFormData({
           name: "",
           email: "",
@@ -89,7 +132,7 @@ const BookingForm = () => {
       }
     } catch (err) {
       console.error("Submit error:", err);
-      alert("Server error.");
+      toast.error("Server error.");
     }
   };
 

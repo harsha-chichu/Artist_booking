@@ -10,6 +10,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@fullcalendar/daygrid": "^6.1.17",
+    "@fullcalendar/interaction": "^6.1.17",
+    "@fullcalendar/react": "^6.1.17",
     "@radix-ui/react-slot": "^1.2.3",
     "@supabase/supabase-js": "^2.50.0",
     "clsx": "^2.1.1",
@@ -17,8 +21,13 @@
     "framer-motion": "^12.16.0",
     "next": "15.3.3",
     "react": "^19.0.0",
+    "react-calendar": "^6.0.0",
     "react-datepicker": "^8.4.0",
+    "react-day-picker": "^9.7.0",
     "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.2",
+    "react-modal": "^3.16.3",
+    "react-modern-calendar-datepicker": "^3.1.6",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
