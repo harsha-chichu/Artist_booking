@@ -151,6 +151,15 @@ export default function AdminDashboard() {
     .filter((b) => b.is_booked)
     .map((b) => new Date(b.date));
 
+  const formatWhatsAppLink = (phone, name) => {
+    const cleaned = phone.replace(/\D/g, "");
+    if (!cleaned || cleaned.length < 10) return null;
+    const message = encodeURIComponent(
+      `Hello ${name}, following up on your booking inquiry.`
+    );
+    return `https://wa.me/${cleaned}?text=${message}`;
+  };
+
   return (
     <section className="min-h-screen bg-white py-12 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
@@ -180,20 +189,15 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Calendar Modal */}
         <Modal
           isOpen={showCalendar}
           onRequestClose={() => setShowCalendar(false)}
           overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-md"
         >
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            📍 Booked Dates
-          </h2>
+          <h2 className="text-xl font-semibold mb-4 text-center">📍 Booked Dates</h2>
           <ModernCalendar bookedDates={bookedDates} />
-          <p className="mt-2 text-sm text-center text-gray-500">
-            Green = Booked
-          </p>
+          <p className="mt-2 text-sm text-center text-gray-500">Green = Booked</p>
           <div className="flex justify-center mt-4">
             <button
               onClick={() => setShowCalendar(false)}
@@ -262,6 +266,8 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredBookings.map((booking) => {
                 const isHighlighted = recentlyUpdated.has(booking.id);
+                const waLink = formatWhatsAppLink(booking.phone, booking.name);
+
                 return (
                   <div
                     key={booking.id}
@@ -334,6 +340,16 @@ export default function AdminDashboard() {
                         />
                         Mark as Booked
                       </label>
+                      {waLink && (
+                        <a
+                          href={waLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                          WhatsApp
+                        </a>
+                      )}
                     </div>
                   </div>
                 );
